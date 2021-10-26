@@ -19,12 +19,12 @@ func RegisterUrlBuilderFlags(f []cli.Flag) []cli.Flag {
 		cli.IntFlag{
 			Name:   proxyPort,
 			Usage:  "proxy port",
-			EnvVar: "TORRENT_HTTP_PROXY_PORT",
+			EnvVar: "TORRENT_HTTP_PROXY_SERVICE_PORT",
 		},
 		cli.StringFlag{
 			Name:   proxyHost,
 			Usage:  "proxy host",
-			EnvVar: "TORRENT_HTTP_PROXY_HOST",
+			EnvVar: "TORRENT_HTTP_PROXY_SERVICE_HOST",
 		},
 		cli.StringFlag{
 			Name:   apiKey,
