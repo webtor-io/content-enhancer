@@ -34,16 +34,14 @@ func (s *ClickHouse) GetTopContent() ([]StatRecord, error) {
 				select infohash, original_path, sum(bytes_written) / 1024 / 1024 / 1024 as downloaded_gb from proxy_stat_all
 				where edge = 'transcode-web-cache' and timestamp > now() - interval 3 hour
 				group by infohash, original_path 
-				order by sum(bytes_written) desc
 			) where downloaded_gb > 3
 			union all
 			select * from (
 				select infohash, original_path as full_path, sum(bytes_written) / 1024 / 1024 / 1024 as downloaded_gb from proxy_stat_all
 				where edge = 'nginx-vod' and timestamp > now() - interval 3 hour
 				group by infohash, original_path 
-				order by sum(bytes_written) desc
 			) where downloaded_gb > 3
-		) order by downloaded_gb desc
+		) order by downloaded_gb asc
 	`)
 
 	if err != nil {
