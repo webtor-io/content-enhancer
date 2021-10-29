@@ -41,7 +41,7 @@ func (s *ClickHouse) GetTopContent() ([]StatRecord, error) {
 				where edge = 'nginx-vod' and timestamp > now() - interval 3 hour
 				group by infohash, original_path 
 			) where downloaded_gb > 3
-		) order by downloaded_gb asc
+		) order by downloaded_gb desc
 	`)
 
 	if err != nil {
