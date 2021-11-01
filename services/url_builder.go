@@ -48,8 +48,18 @@ func NewUrlBuilder(c *cli.Context) *UrlBuilder {
 	}
 }
 
-func (s *UrlBuilder) Build(sr *StatRecord) string {
+func (s *UrlBuilder) BuildInvokeUrl(sr *StatRecord) string {
 	return fmt.Sprintf("http://%v:%v/%v/%v~tc~mhls~mhlsp?api-key=%v",
+		s.proxyHost,
+		s.proxyPort,
+		sr.InfoHash,
+		url.PathEscape(strings.TrimLeft(sr.OriginalPath, "/")),
+		s.apiKey,
+	)
+}
+
+func (s *UrlBuilder) BuildDoneUrl(sr *StatRecord) string {
+	return fmt.Sprintf("http://%v:%v/%v/%v~tc~mtrc/done?api-key=%v",
 		s.proxyHost,
 		s.proxyPort,
 		sr.InfoHash,

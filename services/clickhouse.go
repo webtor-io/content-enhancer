@@ -1,8 +1,15 @@
 package services
 
 import (
+	"fmt"
+
 	"github.com/pkg/errors"
 	"github.com/urfave/cli"
+)
+
+const (
+	checkHours = 24
+	checkGBs   = 5
 )
 
 type ClickHouse struct {
@@ -28,21 +35,21 @@ func (s *ClickHouse) GetTopContent() ([]StatRecord, error) {
 
 	recs := []StatRecord{}
 
-	rows, err := db.Query(`
+	rows, err := db.Query(fmt.Sprintf(`
 		select * from (
 			select * from (
 				select infohash, original_path, sum(bytes_written) / 1024 / 1024 / 1024 as downloaded_gb from proxy_stat_all
-				where edge = 'transcode-web-cache' and timestamp > now() - interval 3 hour
+				where edge = 'transcode-web-cache' and timestamp > now() - interval %v hour
 				group by infohash, original_path 
-			) where downloaded_gb > 3
+			) where downloaded_gb > %v
 			union all
 			select * from (
 				select infohash, original_path as full_path, sum(bytes_written) / 1024 / 1024 / 1024 as downloaded_gb from proxy_stat_all
-				where edge = 'nginx-vod' and timestamp > now() - interval 3 hour
+				where edge = 'nginx-vod' and timestamp > now() - interval %v hour
 				group by infohash, original_path 
-			) where downloaded_gb > 3
+			) where downloaded_gb > %v
 		) order by downloaded_gb desc
-	`)
+	`, checkHours, checkGBs, checkHours, checkGBs))
 
 	if err != nil {
 		return nil, err

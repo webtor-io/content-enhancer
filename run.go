@@ -36,9 +36,20 @@ func run(c *cli.Context) error {
 	}
 	for _, r := range recs {
 		log.Infof("got record=%+v", r)
-		u := ub.Build(&r)
+		du := ub.BuildDoneUrl(&r)
+		resp, err := cl.Get(du)
+		if err != nil {
+			log.WithError(err).Warnf("failed to check done marker url=\"%v\"", du)
+			continue
+		}
+		defer resp.Body.Close()
+		if resp.StatusCode == http.StatusOK {
+			log.Infof("job already done url=\"%v\" status=\"%v\" code=%v", du, resp.Status, resp.StatusCode)
+			continue
+		}
+		u := ub.BuildInvokeUrl(&r)
 		log.Infof("invoking url=\"%v\"", u)
-		resp, err := cl.Get(u)
+		resp, err = cl.Get(u)
 		if err != nil {
 			log.WithError(err).Warnf("failed to invoke job url=\"%v\"", u)
 			continue
